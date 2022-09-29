@@ -8,55 +8,59 @@ import java.math.BigDecimal;
 import java.util.EnumSet;
 import java.util.Scanner;
 
-public class mainCurrency {
-    public static void main(String[] args) {
+public class MainCurrency {
+    public static void main(String[] args) throws CurrencyNotFoundException {
 
         for (CurrencyCode info : EnumSet.allOf(CurrencyCode.class)) {
             System.out.println(info + " — " + info.getName() + ";");
         }
 
-        Scanner ScanFromCurrency = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
         System.out.println("Zəhmət olmasa satmaq istədiyiniz valyutanın 3 rəqəmli kodunu daxil edin: ");
-        String FromCurrency = ScanFromCurrency.nextLine();
+        String FromCurrency = scanner.nextLine();
 
-        Scanner ScanToCurrency = new Scanner(System.in);
         System.out.println('\n' + "Zəhmət olmasa almaq istədiyiniz valyutanın 3 rəqəmli kodunu daxil edin: ");
-        String ToCurrency = ScanToCurrency.nextLine();
+        String ToCurrency = scanner.nextLine();
 
-        Scanner ScanAmount = new Scanner(System.in);
         System.out.print("Satmaq istədiyiniz məbləği qeyd edin: ");
-        BigDecimal Amount = ScanAmount.nextBigDecimal();
+        BigDecimal Amount = scanner.nextBigDecimal();
 
-        if (FromCurrency.toUpperCase().equals("AZN") && ToCurrency.toUpperCase().equals("USD")) {
-            try {
-                BigDecimal ResultCurrency = CurrencyConverter.convertFromAzn(Amount, CurrencyCode.USD);
-                System.out.println(ResultCurrency);
-            } catch (CurrencyNotFoundException e) {
-                e.printStackTrace();
-            }
-        } else if (FromCurrency.toUpperCase().equals("AZN") && ToCurrency.toUpperCase().equals("EUR")) {
-            try {
-                BigDecimal ResultCurrency = CurrencyConverter.convertFromAzn(Amount, CurrencyCode.EUR);
-                System.out.println(ResultCurrency);
-            } catch (CurrencyNotFoundException e) {
-                e.printStackTrace();
-            }
-        } else if (FromCurrency.toUpperCase().equals("AZN") && ToCurrency.toUpperCase().equals("RUB")) {
-            try {
-                BigDecimal ResultCurrency = CurrencyConverter.convertFromAzn(Amount, CurrencyCode.RUB);
-                System.out.println(ResultCurrency);
-            } catch (CurrencyNotFoundException e) {
-                e.printStackTrace();
-            }
-        } else if (FromCurrency.toUpperCase().equals("AZN") && ToCurrency.toUpperCase().equals("TRY")) {
-            try {
-                BigDecimal ResultCurrency = CurrencyConverter.convertFromAzn(Amount, CurrencyCode.TRY);
-                System.out.println(ResultCurrency);
-            } catch (CurrencyNotFoundException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("Qaqa yoxu bizde elə valyuta");
+        try {
+            BigDecimal result = doConvertation(FromCurrency, ToCurrency, Amount);
+            System.out.println(result);
+        } catch (CurrencyNotFoundException e) {
+            throw new RuntimeException(e);
         }
+
+//        try {
+//            if (FromCurrency.equalsIgnoreCase("AZN") && ToCurrency.equalsIgnoreCase("USD")) {
+//                    BigDecimal ResultCurrency = CurrencyConverter.convertFromAzn(Amount, CurrencyCode.USD);
+//                    System.out.println(ResultCurrency);
+//            } else if (FromCurrency.toUpperCase().equals("AZN") && ToCurrency.toUpperCase().equals("EUR")) {
+//                    BigDecimal ResultCurrency = CurrencyConverter.convertFromAzn(Amount, CurrencyCode.EUR);
+//                    System.out.println(ResultCurrency);
+//            } else if (FromCurrency.toUpperCase().equals("AZN") && ToCurrency.toUpperCase().equals("RUB")) {
+//                    BigDecimal ResultCurrency = CurrencyConverter.convertFromAzn(Amount, CurrencyCode.RUB);
+//                    System.out.println(ResultCurrency);
+//            } else if (FromCurrency.toUpperCase().equals("AZN") && ToCurrency.toUpperCase().equals("TRY")) {
+//                    BigDecimal ResultCurrency = CurrencyConverter.convertFromAzn(Amount, CurrencyCode.TRY);
+//                    System.out.println(ResultCurrency);
+//            } else {
+//                System.out.println("Qaqa yoxu bizde elə valyuta");
+//            }
+//        } catch (CurrencyNotFoundException e) {
+//            e.printStackTrace();
+//        }
+    }
+
+    private static BigDecimal doConvertation(String from, String to, BigDecimal amount)
+        throws CurrencyNotFoundException {
+        CurrencyCode fromCurrency = CurrencyCode.valueOf(from.toUpperCase());
+        CurrencyCode toCurrency = CurrencyCode.valueOf(to.toUpperCase());
+        if (fromCurrency == CurrencyCode.AZN) {
+            return CurrencyConverter.convertFromAzn(amount, toCurrency);
+        } else {
+            return CurrencyConverter.convertToAzn(amount, fromCurrency);
         }
     }
+}
